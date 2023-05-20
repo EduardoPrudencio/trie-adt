@@ -83,14 +83,14 @@ namespace TrieADT
                     return words;
                 }
 
-                StringBuilder word = GetWord(current, prefix);
+                List<string> newWords = GetWord(current, prefix).Item2;
                 current = current.Children[index];
             }
 
             return words;
         }
 
-        private StringBuilder GetWord(TrieNode node, string prefix, StringBuilder? wordReceived = null, List<string> words = null)
+        private (StringBuilder, List<string>) GetWord(TrieNode node, string prefix, StringBuilder? wordReceived = null, List<string>? words = null)
         {
             if (wordReceived == null) wordReceived = new StringBuilder();
 
@@ -109,11 +109,12 @@ namespace TrieADT
 
             bool patternFound = prefix.Equals(wordReceived.ToString());
 
-            if (children != null && !children.IsEndOfWord) wordReceived = GetWord(children, prefix, wordReceived, words);
+            if (children != null && !children.IsEndOfWord)
+                (wordReceived, words) = GetWord(children, prefix, wordReceived, words);
+            else
+                words.Add(wordReceived.ToString());
 
-            words.Add(wordReceived.ToString());
-
-            return wordReceived;
+            return (wordReceived, words);
         }
     }
 }
