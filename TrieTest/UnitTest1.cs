@@ -40,8 +40,9 @@ namespace TrieTest
         public void Deve_Encontrar_Palavras_Por_Prefixo()
         {
             Trie trie = new Trie();
-            trie.Insert("abacaxi");
-            Assert.IsTrue(trie.GetWordsThatStartsWith("aba").Count == 1);
+            trie.Insert("telefone");
+            trie.Insert("teleferico");
+            Assert.IsTrue(trie.GetWordsThatStartsWith("tel").Count == 1);
         }
     }
 }

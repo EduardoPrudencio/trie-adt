@@ -83,26 +83,37 @@ namespace TrieADT
                     return words;
                 }
 
-                string word = GetWord(current.Children[index]);
-
+                StringBuilder word = GetWord(current, prefix);
                 current = current.Children[index];
             }
 
             return words;
         }
 
-        private string GetWord(TrieNode node)
+        private StringBuilder GetWord(TrieNode node, string prefix, StringBuilder? wordReceived = null, List<string> words = null)
         {
-            TrieNode firstLetter = node.Children.FirstOrDefault(t => t != null);
+            if (wordReceived == null) wordReceived = new StringBuilder();
 
-            StringBuilder wordReceived = new StringBuilder();
+            if (words == null) words = new List<string>();
 
-            for (int i = 0; i < node.Children.Length; i++)
+            if (node is null)
             {
-                
+                throw new ArgumentNullException(nameof(node));
             }
 
-            return wordReceived.ToString();
+            TrieNode children = node.Children.FirstOrDefault(t => t != null);
+
+            int index = Array.IndexOf(node.Children, children);
+
+            wordReceived.Append(letters[index]);
+
+            bool patternFound = prefix.Equals(wordReceived.ToString());
+
+            if (children != null && !children.IsEndOfWord) wordReceived = GetWord(children, prefix, wordReceived, words);
+
+            words.Add(wordReceived.ToString());
+
+            return wordReceived;
         }
     }
 }
