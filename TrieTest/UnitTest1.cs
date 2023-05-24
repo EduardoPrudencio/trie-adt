@@ -41,7 +41,9 @@ namespace TrieTest
         {
             Trie trie = new Trie();
             trie.Insert("telefone");
-            trie.Insert("teleferico");
+            trie.Insert("Abacaxi");
+            trie.Insert("Abacadabra");
+            trie.Insert("Jose");
             Assert.IsTrue(trie.GetWordsThatStartsWith("tel").Count == 1);
         }
     }

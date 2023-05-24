@@ -18,7 +18,7 @@ namespace TrieADT
 
             for (int i = 0; i < word.Length; i++)
             {
-                int index = word[i] - 'a'; // Assuming lowercase English letters
+                int index = word.ToLower()[i] - 'a'; // Assuming lowercase English letters
 
                 if (current.Children[index] == null)
                 {
@@ -83,7 +83,7 @@ namespace TrieADT
                     return words;
                 }
 
-                List<string> newWords = GetWord(current, prefix).Item2;
+                List<string> newWords = GetWord(current).Item2;
                 current = current.Children[index];
             }
 
@@ -107,12 +107,52 @@ namespace TrieADT
 
             wordReceived.Append(letters[index]);
 
-            bool patternFound = prefix.Equals(wordReceived.ToString());
+            if (prefix.Equals(wordReceived.ToString()))
+            {
+                List<TrieNode> tries = children.Children.Where(c => c != null).ToList();
+
+                for (int i = 0; i < tries.Count(); i++)
+                {
+                    words.AddRange(GetWord(tries[i], wordReceived, words).Item2);
+                }
+            }
 
             if (children != null && !children.IsEndOfWord)
                 (wordReceived, words) = GetWord(children, prefix, wordReceived, words);
             else
                 words.Add(wordReceived.ToString());
+
+            return (wordReceived, words);
+        }
+
+        private (StringBuilder, List<string>) GetWord(TrieNode node, StringBuilder? wordReceived = null, List<string>? words = null)
+        {
+            if (wordReceived == null) wordReceived = new StringBuilder();
+
+            if (words == null) words = new List<string>();
+
+            if (node is null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
+            List<TrieNode> allChildrenWithContent = node.Children.Where(t => t != null).ToList();
+
+            for (int i = 0; i < allChildrenWithContent.Count; i++)
+            {
+                int index = Array.IndexOf(node.Children, allChildrenWithContent[i]);
+
+                wordReceived.Append(letters[index]);
+
+                if (allChildrenWithContent[i] != null && !allChildrenWithContent[i].IsEndOfWord)
+                    (wordReceived, words) = GetWord(allChildrenWithContent[i], wordReceived, words);
+                else
+                {
+                    words.Add(wordReceived.ToString());
+                    wordReceived.Clear();
+                }
+            }
+
 
             return (wordReceived, words);
         }
