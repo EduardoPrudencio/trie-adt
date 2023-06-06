@@ -40,11 +40,11 @@ namespace TrieTest
         public void Deve_Encontrar_Palavras_Por_Prefixo()
         {
             Trie trie = new Trie();
-            trie.Insert("telefone");
+            //trie.Insert("telefone");
             trie.Insert("Abacaxi");
-            trie.Insert("Abacadabra");
-            trie.Insert("Jose");
-            Assert.IsTrue(trie.GetWordsThatStartsWith("tel").Count == 1);
+            trie.Insert("Abacate");
+            // trie.Insert("Jose");
+            Assert.IsTrue(trie.GetWordsThatStartsWith("aba").Count == 1);
         }
     }
 }

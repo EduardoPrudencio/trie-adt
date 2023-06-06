@@ -83,78 +83,65 @@ namespace TrieADT
                     return words;
                 }
 
-                List<string> newWords = GetWord(current).Item2;
+                List<string> newWords = GetWordsByPrefix(prefix);
                 current = current.Children[index];
+
             }
 
             return words;
         }
 
-        private (StringBuilder, List<string>) GetWord(TrieNode node, string prefix, StringBuilder? wordReceived = null, List<string>? words = null)
+        public List<string> GetWordsByPrefix(string prefix)
         {
-            if (wordReceived == null) wordReceived = new StringBuilder();
+            List<string> words = new List<string>();
+            TrieNode prefixNode = GetPrefixNode(prefix);
 
-            if (words == null) words = new List<string>();
-
-            if (node is null)
+            if (prefixNode != null)
             {
-                throw new ArgumentNullException(nameof(node));
+                StringBuilder currentWord = new StringBuilder(prefix);
+                GetWordsByPrefix(prefixNode, currentWord, words);
             }
 
-            TrieNode children = node.Children.FirstOrDefault(t => t != null);
-
-            int index = Array.IndexOf(node.Children, children);
-
-            wordReceived.Append(letters[index]);
-
-            if (prefix.Equals(wordReceived.ToString()))
-            {
-                List<TrieNode> tries = children.Children.Where(c => c != null).ToList();
-
-                for (int i = 0; i < tries.Count(); i++)
-                {
-                    words.AddRange(GetWord(tries[i], wordReceived, words).Item2);
-                }
-            }
-
-            if (children != null && !children.IsEndOfWord)
-                (wordReceived, words) = GetWord(children, prefix, wordReceived, words);
-            else
-                words.Add(wordReceived.ToString());
-
-            return (wordReceived, words);
+            return words;
         }
 
-        private (StringBuilder, List<string>) GetWord(TrieNode node, StringBuilder? wordReceived = null, List<string>? words = null)
+        private TrieNode GetPrefixNode(string prefix)
         {
-            if (wordReceived == null) wordReceived = new StringBuilder();
+            TrieNode current = root;
 
-            if (words == null) words = new List<string>();
-
-            if (node is null)
+            foreach (char c in prefix)
             {
-                throw new ArgumentNullException(nameof(node));
+                int index = c - 'a';
+
+                if (current.Children[index] == null)
+                {
+                    return null;
+                }
+
+                current = current.Children[index];
             }
 
-            List<TrieNode> allChildrenWithContent = node.Children.Where(t => t != null).ToList();
+            return current;
+        }
 
-            for (int i = 0; i < allChildrenWithContent.Count; i++)
+        private void GetWordsByPrefix(TrieNode node, StringBuilder currentWord, List<string> words)
+        {
+            if (node.IsEndOfWord)
             {
-                int index = Array.IndexOf(node.Children, allChildrenWithContent[i]);
+                words.Add(currentWord.ToString());
+            }
 
-                wordReceived.Append(letters[index]);
-
-                if (allChildrenWithContent[i] != null && !allChildrenWithContent[i].IsEndOfWord)
-                    (wordReceived, words) = GetWord(allChildrenWithContent[i], wordReceived, words);
-                else
+            for (int i = 0; i < node.Children.Length; i++)
+            {
+                if (node.Children[i] != null)
                 {
-                    words.Add(wordReceived.ToString());
-                    wordReceived.Clear();
+                    char letter = (char)('a' + i);
+                    currentWord.Append(letter);
+                    GetWordsByPrefix(node.Children[i], currentWord, words);
+                    currentWord.Length--;
                 }
             }
-
-
-            return (wordReceived, words);
         }
+
     }
 }
